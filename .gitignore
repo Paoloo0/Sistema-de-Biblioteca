@@ -1,0 +1,11 @@
+target/
+*.class
+.nb-gradle/
+nbproject/private/
+build/
+nbdist/
+dist/
+.idea/
+.vscode/
+*.log
+*.tmp

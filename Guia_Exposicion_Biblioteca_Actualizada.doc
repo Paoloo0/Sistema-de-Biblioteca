@@ -1,0 +1,212 @@
+
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8">
+<title>Guía de Exposición - Sistema de Biblioteca</title>
+<!--[if gte mso 9]>
+<xml>
+<w:WordDocument>
+<w:View>Print</w:View>
+<w:Zoom>100</w:Zoom>
+<w:DoNotOptimizeForBrowser/>
+</w:WordDocument>
+</xml>
+<![endif]-->
+<style>
+@page {
+    size: 8.5in 11in;
+    margin: 1.0in 1.0in 1.0in 1.0in;
+    mso-header-margin: .5in;
+    mso-footer-margin: .5in;
+    mso-paper-source: 0;
+}
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #333333;
+}
+h1 {
+    font-size: 20pt;
+    color: #1F497D;
+    border-bottom: 2px solid #1F497D;
+    padding-bottom: 5px;
+    margin-top: 24pt;
+    margin-bottom: 12pt;
+}
+h2 {
+    font-size: 14pt;
+    color: #595959;
+    margin-top: 18pt;
+    margin-bottom: 6pt;
+}
+h3 {
+    font-size: 12pt;
+    color: #1F497D;
+    margin-top: 12pt;
+    margin-bottom: 4pt;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12pt 0;
+}
+th {
+    background-color: #1F497D;
+    color: #FFFFFF;
+    font-weight: bold;
+    border: 1px solid #D3D3D3;
+    padding: 8px;
+    text-align: left;
+}
+td {
+    border: 1px solid #D3D3D3;
+    padding: 8px;
+    vertical-align: top;
+}
+ul, ol {
+    margin-top: 0;
+    margin-bottom: 12pt;
+    padding-left: 20px;
+}
+li {
+    margin-bottom: 4pt;
+}
+.highlight {
+    background-color: #F2F4F7;
+    border-left: 4px solid #1F497D;
+    padding: 10px;
+    margin: 12pt 0;
+}
+.code {
+    font-family: Consolas, Courier, monospace;
+    font-size: 9.5pt;
+    background-color: #F8F9FA;
+    padding: 2px 4px;
+    border: 1px solid #EAEAEA;
+}
+.alert {
+    background-color: #FFF2CC;
+    border-left: 4px solid #D68F00;
+    padding: 10px;
+    margin: 12pt 0;
+}
+</style>
+</head>
+<body>
+
+<div style="text-align: center; margin-bottom: 30pt;">
+    <h1 style="border-bottom: none; font-size: 26pt; color: #1F497D; margin-bottom: 10pt;">GUÍA COMPLETA DE EXPOSICIÓN</h1>
+    <h2 style="font-size: 16pt; color: #595959; margin-top: 0;">Sistema de Control de Préstamos de Biblioteca</h2>
+    <p style="font-size: 12pt; color: #7F7F7F;">Proyecto Java Desktop (Swing, JDBC) & MySQL</p>
+</div>
+
+<hr style="border: 1px solid #1F497D; margin-bottom: 20pt;">
+
+<h1>1. Resumen y Propósito del Sistema</h1>
+<p>El proyecto es un <strong>Sistema de Gestión y Control de Préstamos para una Biblioteca</strong> desarrollado bajo el patrón de diseño <strong>MVC (Modelo-Vista-Controlador)</strong>. Su objetivo principal es automatizar los procesos operativos de registro de usuarios, empleados, catálogo de libros y, de manera transaccional, el registro de préstamos de libros, controlando estrictamente el stock de los mismos en la base de datos.</p>
+
+<h1>2. Estructura de la Base de Datos (MySQL)</h1>
+<p>El diseño de la base de datos consta de 5 tablas principales interrelacionadas mediante llaves foráneas y restricciones de integridad:</p>
+<ul>
+    <li><strong>USUARIO:</strong> Almacena la información de los lectores de la biblioteca (ID, Nombre, Dirección, Teléfono, Correo). Posee restricciones para evitar duplicados por nombre.</li>
+    <li><strong>EMPLEADO:</strong> Registra al personal de la biblioteca (ID, Nombre, Puesto, Usuario, Contraseña). Las credenciales permiten un acceso dinámico al sistema.</li>
+    <li><strong>LIBRO:</strong> Contiene el catálogo de libros (ID, Título, Autor, Editorial, ISBN, Año, Stock). Controla estrictamente la disponibilidad física de los textos.</li>
+    <li><strong>PRESTAMO:</strong> Cabecera de la transacción de préstamo (ID, Usuario, Empleado, Fecha de Salida, Fecha de Devolución Máxima, Estado). Relaciona qué usuario solicita el libro y qué empleado autoriza la salida.</li>
+    <li><strong>PRESTAMO_DETALLE:</strong> Tabla intermedia de la relación Muchos a Muchos entre <em>Prestamo</em> y <em>Libro</em>, permitiendo asociar múltiples libros a una sola orden de préstamo.</li>
+</ul>
+
+<h1>3. Estructura del Código Java (NetBeans)</h1>
+<p>El código está organizado en cuatro paquetes principales aplicando la arquitectura MVC:</p>
+
+<h3>A. Paquete Modelo (modelo)</h3>
+<p>Contiene clases del dominio (POJOs) que representan las tablas de la base de datos con sus respectivos atributos, constructores, getters, setters y el método <code>toString()</code>:</p>
+<ul>
+    <li><code>Usuario.java</code></li>
+    <li><code>Empleado.java</code> (incluye campos de credenciales de acceso)</li>
+    <li><code>Libro.java</code></li>
+    <li><code>Prestamo.java</code> & <code>PrestamoDetalle.java</code></li>
+</ul>
+
+<h3>B. Paquete Acceso a Datos (dao)</h3>
+<p>Clases responsables de realizar las operaciones SQL en la base de datos mediante JDBC:</p>
+<ul>
+    <li><code>UsuarioDAO.java</code>: CRUD de usuarios y validación de nombres duplicados.</li>
+    <li><code>EmpleadoDAO.java</code>: CRUD de empleados y la lógica de verificación de credenciales <code>validarLogin(usuario, contrasena)</code>.</li>
+    <li><code>LibroDAO.java</code>: CRUD de libros, buscador por texto libre y validación de ISBN únicos.</li>
+    <li><code>PrestamoDAO.java</code>: Contiene la lógica transaccional para registrar préstamos disminuyendo el stock del libro y revirtiendo operaciones (Rollback) en caso de fallo.</li>
+</ul>
+
+<h3>C. Paquete Vista (vista)</h3>
+<p>Contiene la interfaz gráfica de usuario construida en Swing:</p>
+<ul>
+    <li><code>FrmLogin.java</code>: Pantalla de inicio de sesión que conecta de forma dinámica con la base de datos.</li>
+    <li><code>FrmPrincipal.java</code>: Tablero principal del sistema organizado por pestañas con restricción de controles de usuario.</li>
+</ul>
+
+<h1>4. Funcionalidades Destacadas (Lo que el jurado evaluará)</h1>
+
+<div class="highlight">
+    <h3>A. Transaccionalidad de Préstamos (ACID)</h3>
+    <p>El registro de un préstamo es un proceso compuesto: se debe insertar en la tabla <code>PRESTAMO</code>, insertar múltiples registros en <code>PRESTAMO_DETALLE</code>, y actualizar el stock de cada libro en <code>LIBRO</code>. En <code>PrestamoDAO.java</code> esto se realiza bajo una sola transacción desactivando el <em>AutoCommit</em>. Si cualquiera de estas operaciones falla (por ejemplo, si el stock es insuficiente), se ejecuta un <strong>Rollback</strong> automático para mantener la integridad de los datos.</p>
+</div>
+
+<div class="highlight">
+    <h3>B. Control de Acceso por Roles Dinámico</h3>
+    <p>Las credenciales se validan en tiempo real contra la tabla de empleados de la base de datos. El sistema asigna privilegios de acuerdo al puesto:</p>
+    <ul>
+        <li><strong>Administrador (Puesto: 'Bibliotecaria Principal', Credencial: admin/admin):</strong> Acceso completo a todas las pestañas. En la pestaña de Nuevo Préstamo, puede seleccionar a cualquier empleado que gestiona la orden de la lista desplegable.</li>
+        <li><strong>Empleado (Puesto: 'Asistente de Biblioteca', Credencial: luis/luis):</strong> Pestaña de gestión de empleados oculta (no puede crear otros empleados). En la pestaña de Nuevo Préstamo, el empleado queda predeterminado a su nombre y bloqueado, impidiendo fraudes o suplantaciones.</li>
+    </ul>
+</div>
+
+<div class="highlight">
+    <h3>C. Validaciones Rigurosas de Entrada</h3>
+    <ul>
+        <li><strong>ISBN del Libro:</strong> Limitado estrictamente a un formato de 13 dígitos y un guion separador (ej. <code>978-3245678345</code>) mediante expresiones regulares (regex).</li>
+        <li><strong>Año del Libro:</strong> Restringido a exactamente 4 dígitos numéricos.</li>
+        <li><strong>Stock del Libro:</strong> Validación en tiempo real a nivel de teclado para admitir únicamente números enteros positivos.</li>
+        <li><strong>Evitar Duplicados:</strong> El sistema consulta la base de datos antes de registrar un nuevo usuario (nombre), empleado (nombre) o libro (ISBN) para evitar redundancias de información.</li>
+    </ul>
+</div>
+
+<h1>5. Guía de Explicación Paso a Paso (Para el Estudiante)</h1>
+
+<h3>Paso 1: Demostración del Login por Roles</h3>
+<p>Inicia el sistema y muestra la pantalla de inicio de sesión. Explica que el login es dinámico y consulta la base de datos en tiempo real.</p>
+<ul>
+    <li>Ingresa primero como empleado usando el usuario <strong>luis</strong> y contraseña <strong>luis</strong>. Muestra cómo la pestaña "Empleados" desaparece y cómo en la pestaña de préstamos su nombre aparece bloqueado.</li>
+    <li>Cierra sesión y vuelve a ingresar como administrador usando el usuario <strong>admin</strong> y contraseña <strong>admin</strong>. Muestra cómo ahora la pestaña "Empleados" está visible y cómo se puede seleccionar cualquier empleado al realizar un préstamo.</li>
+</ul>
+
+<h3>Paso 2: Registrar un Libro con Validaciones</h3>
+<p>Ve a la pestaña Libros e intenta ingresar letras en el campo stock (el sistema no te dejará). Intenta guardar un libro con un ISBN incorrecto o un año de 2 dígitos (el sistema mostrará una alerta de advertencia). Esto demuestra la robustez del software.</p>
+
+<h3>Paso 3: Realizar un Préstamo y explicar la Transacción</h3>
+<p>Registra un préstamo agregando un libro de la lista. Explica al jurado: <em>"En este paso, la aplicación realiza una transacción SQL de manera atómica: inserta la cabecera, inserta el detalle y actualiza el stock restándole 1 al libro prestado. Todo bajo el control de transacciones de JDBC."</em></p>
+
+<h1>6. Preguntas Frecuentes del Jurado y Respuestas Clave</h1>
+
+<table>
+    <tr>
+        <th>Pregunta del Jurado</th>
+        <th>Respuesta Recomendada</th>
+    </tr>
+    <tr>
+        <td><strong>¿Cómo garantizan que un libro no se preste si no hay stock?</strong></td>
+        <td>Antes de agregar el libro a la lista temporal de préstamos, la interfaz gráfica valida que el stock del objeto <code>Libro</code> seleccionado sea mayor a 0. Además, durante la transacción en la base de datos se verifica la disponibilidad antes de confirmar el descuento del stock.</td>
+    </tr>
+    <tr>
+        <td><strong>¿Por qué el login de empleados es dinámico?</strong></td>
+        <td>Porque las credenciales no están quemadas (hardcoded) en el código. El administrador general puede ir a la pestaña 'Empleados', crear un nuevo empleado con su usuario y contraseña, y este nuevo registro podrá iniciar sesión inmediatamente ya que la verificación se hace con una consulta directa a la tabla <code>EMPLEADO</code>.</td>
+    </tr>
+    <tr>
+        <td><strong>¿Qué pasa si la conexión a la base de datos falla a mitad de un préstamo?</strong></td>
+        <td>Como desactivamos el <code>setAutoCommit(false)</code> al inicio del registro, los cambios parciales quedan en memoria temporal de MySQL. Si ocurre un fallo de red o base de datos, el bloque <code>catch</code> ejecuta un <code>rollback()</code>, cancelando todo el proceso y dejando la base de datos en su estado original intacto.</td>
+    </tr>
+</table>
+
+</body>
+</html>
